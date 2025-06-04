@@ -95,5 +95,6 @@ if uploaded_file is not None:
                 label="📥 Download Sorted Invoices",
                 data=output_pdf,
                 file_name="sorted " + uploaded_file.name",
+            
                 mime="application/pdf"
             )
