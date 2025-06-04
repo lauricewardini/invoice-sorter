@@ -94,7 +94,7 @@ if uploaded_file is not None:
             st.download_button(
                 label="📥 Download Sorted Invoices",
                 data=output_pdf,
-                file_name="sorted " + uploaded_file.name",
+                file_name="sorted " + uploaded_file.name,
             
                 mime="application/pdf"
             )
