@@ -6,7 +6,7 @@ import re
 
 st.set_page_config(page_title="🍩 Donut Land Invoice Sorter", layout="centered")
 st.title("🍩 Donut Land Invoice Sorter")
-st.write("Upload your QuickBooks invoices PDF below and we'll sort them by date and packing note (Box, Tray, etc).")
+st.write("Upload your QuickBooks invoices PDF below and we'll sort them by date and packing note (Brown Boxes, Trays, etc).")
 
 uploaded_file = st.file_uploader("📤 Upload PDF", type=["pdf"])
 
