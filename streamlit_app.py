@@ -34,16 +34,31 @@ if uploaded_file is not None:
                             continue
                 return datetime(1900, 1, 1).date()
 
-            def extract_items(text):
-                item_counts = defaultdict(int)
-                lines = text.splitlines()
-                for line in lines:
-                    match = re.match(r'\s*(\d+)\s+([A-Za-z ]+)', line.strip())
-                    if match:
-                        qty = int(match.group(1))
-                        item = match.group(2).strip()
-                        item_counts[item] += qty
-                return item_counts
+        def extract_items(text):
+    item_counts = defaultdict(int)
+
+    # Define a list of valid donut item names you want to track
+    valid_items = {
+        "Maple Bar", "Chocolate Bar", "Raspberry Filled", "Cream Filled",
+        "Twist", "Apple Fritter", "Bear Claw", "Cin Roll", "Buttermilk Bar",
+        "Glazed Raised", "Old Fashioned", "Vanilla Cake", "Chocolate Cake"
+    }
+
+    lines = text.splitlines()
+    for line in lines:
+        # Match lines that start with a quantity followed by an item name
+        match = re.match(r'^\\s*(\\d+)\\s+([A-Za-z ]+)', line.strip())
+        if match:
+            qty = int(match.group(1))
+            item = match.group(2).strip()
+
+            # Optional: normalize item name (e.g., remove plural or casing)
+            item = item.title()
+
+            if item in valid_items:
+                item_counts[item] += qty
+
+    return item_counts
 
             current_invoice = {
                 'date': None,
@@ -111,9 +126,6 @@ if uploaded_file is not None:
                     summary_by_date[date][item] += qty
                 for page_index in page_indices:
                     writer.add_page(reader.pages[page_index])
-
-                # Add a blank page after each day's invoices
-                writer.add_blank_page()
 
             # Save sorted PDF temporarily
             with NamedTemporaryFile(delete=False, suffix=".pdf") as temp_sorted_file:
