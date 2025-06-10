@@ -14,30 +14,20 @@ st.write("Upload your QuickBooks invoices PDF below and we'll sort them by date 
 
 uploaded_file = st.file_uploader("📤 Upload PDF", type=["pdf"])
 
-if uploaded_file is not None:
-    st.success("PDF uploaded! Click the button below to start sorting.")
-    if st.button("🔃 Sort My Invoices"):
-        with st.spinner("Sorting invoices and generating summaries..."):
-            pdf_bytes = uploaded_file.read()
-            reader = PdfReader(io.BytesIO(pdf_bytes))
-
-            invoice_data = []
-
-            def extract_date(text):
-                match = re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})', text)
-                if match:
-                    date_str = match.group(1)
-                    for fmt in ("%m/%d/%Y", "%m/%d/%y"):
-                        try:
-                            return datetime.strptime(date_str, fmt).date()
-                        except ValueError:
-                            continue
-                return datetime(1900, 1, 1).date()
+def extract_date(text):
+    match = re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})', text)
+    if match:
+        date_str = match.group(1)
+        for fmt in ("%m/%d/%Y", "%m/%d/%y"):
+            try:
+                return datetime.strptime(date_str, fmt).date()
+            except ValueError:
+                continue
+    return datetime(1900, 1, 1).date()
 
 def extract_items(text):
     item_counts = defaultdict(int)
 
-    # Define only the donut names you care about
     valid_items = {
         "Maple Bar", "Chocolate Bar", "Raspberry Filled", "Cream Filled",
         "Twist", "Apple Fritter", "Bear Claw", "Cin Roll", "Buttermilk Bar",
@@ -47,16 +37,23 @@ def extract_items(text):
 
     lines = text.splitlines()
     for line in lines:
-        match = re.match(r'^\\s*(\\d+)\\s+([A-Za-z ]+)', line.strip())
+        match = re.match(r'^\s*(\d+)\s+([A-Za-z ]+)', line.strip())
         if match:
             qty = int(match.group(1))
             item = match.group(2).strip().title()
-
             if item in valid_items:
                 item_counts[item] += qty
 
     return item_counts
 
+if uploaded_file is not None:
+    st.success("PDF uploaded! Click the button below to start sorting.")
+    if st.button("🔃 Sort My Invoices"):
+        with st.spinner("Sorting invoices and generating summaries..."):
+            pdf_bytes = uploaded_file.read()
+            reader = PdfReader(io.BytesIO(pdf_bytes))
+
+            invoice_data = []
             current_invoice = {
                 'date': None,
                 'note': None,
@@ -165,4 +162,5 @@ def extract_items(text):
                     file_name=final_filename,
                     mime="application/pdf"
                 )
+
 
