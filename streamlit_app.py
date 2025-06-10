@@ -34,26 +34,23 @@ if uploaded_file is not None:
                             continue
                 return datetime(1900, 1, 1).date()
 
-        def extract_items(text):
+def extract_items(text):
     item_counts = defaultdict(int)
 
-    # Define a list of valid donut item names you want to track
+    # Define only the donut names you care about
     valid_items = {
         "Maple Bar", "Chocolate Bar", "Raspberry Filled", "Cream Filled",
         "Twist", "Apple Fritter", "Bear Claw", "Cin Roll", "Buttermilk Bar",
-        "Glazed Raised", "Old Fashioned", "Vanilla Cake", "Chocolate Cake"
+        "Glazed Raised", "Old Fashioned", "Vanilla Cake", "Chocolate Cake",
+        "Sugar Raised", "Devils Food", "Coconut Bar"
     }
 
     lines = text.splitlines()
     for line in lines:
-        # Match lines that start with a quantity followed by an item name
         match = re.match(r'^\\s*(\\d+)\\s+([A-Za-z ]+)', line.strip())
         if match:
             qty = int(match.group(1))
-            item = match.group(2).strip()
-
-            # Optional: normalize item name (e.g., remove plural or casing)
-            item = item.title()
+            item = match.group(2).strip().title()
 
             if item in valid_items:
                 item_counts[item] += qty
