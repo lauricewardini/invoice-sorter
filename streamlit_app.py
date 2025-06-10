@@ -11,7 +11,7 @@ st.set_page_config(page_title="🍩 Donut Land Invoice Sorter", layout="centered
 st.title("🍩 Donut Land Invoice Sorter")
 st.write("Upload your QuickBooks invoices PDF and we’ll sort them by date and packing note, then insert a daily donut count summary right after each day’s invoices.")
 
-uploaded_file = st.file_uploader("📤 Upload PDF", type=["pdf"])
+uploaded_file = st.file_uploader("📄 Upload PDF", type=["pdf"])
 
 def extract_date(text):
     match = re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})', text)
@@ -29,11 +29,11 @@ def extract_items(text):
     valid_items = {
         "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled", "Raspberry Filled", 
         "Lemon Filled", "Sugar Raised", "Twist", "Apple Fritter", "Raspberry Fritter", "Blueberry Fritter", "Bear Claw", 
-        "Frosted Claw", "Berry Claw, "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain), "French Cruller",
-        "French Cruller (Chocolate), "French Cruller (Maple), "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
-        "Old Fashioned (Maple)", Old Fashioned (Plain), "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
+        "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller",
+        "French Cruller (Chocolate)", "French Cruller (Maple)", "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
+        "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
         "Plain Cake with Choc Sprinkles", "Devil's Food", "Devil's Food with Sprinkles", "Coconut Cake (Vanilla)", 
-        "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake",
+        "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake"
     }
 
     lines = text.splitlines()
@@ -52,7 +52,7 @@ def create_summary_page(date, item_summary):
     page = doc.new_page()
     page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
     y = 100
-    for item, qty in item_summary.items():
+    for item, qty in sorted(item_summary.items()):
         page.insert_text((50, y), f"{item}: {qty}", fontsize=12)
         y += 20
     temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
@@ -130,22 +130,18 @@ if uploaded_file is not None:
 
             for idx, (date, _, page_indices, items) in enumerate(sorted_invoices):
                 if current_day and date != current_day:
-                    # Inject summary for previous day
                     summary_path = create_summary_page(current_day, daily_items)
                     with open(summary_path, "rb") as f:
                         summary_reader = PdfReader(f)
                         for page in summary_reader.pages:
                             writer.add_page(page)
-                    daily_items = defaultdict(int)  # Reset for next day
+                    daily_items = defaultdict(int)
 
                 current_day = date
                 for item, qty in items.items():
                     daily_items[item] += qty
-
                 for page_index in page_indices:
                     writer.add_page(reader_pages[page_index])
-
-                # If this is the last invoice, add summary right after
                 if idx == len(sorted_invoices) - 1:
                     summary_path = create_summary_page(current_day, daily_items)
                     with open(summary_path, "rb") as f:
@@ -159,7 +155,7 @@ if uploaded_file is not None:
 
             st.success("✅ Done! Download your sorted PDF with daily summaries below:")
             st.download_button(
-                "📅 Download PDF with Daily Donut Totals",
+                "🗕️ Download PDF with Daily Donut Totals",
                 open(temp_output_path, "rb"),
                 file_name="sorted " + uploaded_file.name,
                 mime="application/pdf"
