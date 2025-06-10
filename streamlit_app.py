@@ -5,13 +5,25 @@ import io
 import re
 import fitz  # PyMuPDF
 from tempfile import NamedTemporaryFile
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 st.set_page_config(page_title="🍩 Donut Land Invoice Sorter", layout="centered")
 st.title("🍩 Donut Land Invoice Sorter")
 st.write("Upload your QuickBooks invoices PDF and we’ll sort them by date and packing note, then insert a daily donut count summary right after each day’s invoices.")
 
 uploaded_file = st.file_uploader("📄 Upload PDF", type=["pdf"])
+
+valid_items_order = [
+    "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled", "Raspberry Filled", 
+    "Lemon Filled", "Sugar Raised", "Twist", "Apple Fritter", "Raspberry Fritter", "Blueberry Fritter", "Bear Claw", 
+    "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller",
+    "French Cruller (Chocolate)", "French Cruller (Maple)", "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
+    "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
+    "Plain Cake with Choc Sprinkles", "Devil's Food", "Devil's Food with Sprinkles", "Coconut Cake (Vanilla)", 
+    "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake"
+]
+valid_items = set(valid_items_order)
+
 
 def extract_date(text):
     match = re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})', text)
@@ -24,18 +36,9 @@ def extract_date(text):
                 continue
     return datetime(1900, 1, 1).date()
 
+
 def extract_items(text):
     item_counts = defaultdict(int)
-    valid_items = {
-        "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled", "Raspberry Filled", 
-        "Lemon Filled", "Sugar Raised", "Twist", "Apple Fritter", "Raspberry Fritter", "Blueberry Fritter", "Bear Claw", 
-        "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller",
-        "French Cruller (Chocolate)", "French Cruller (Maple)", "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
-        "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
-        "Plain Cake with Choc Sprinkles", "Devil's Food", "Devil's Food with Sprinkles", "Coconut Cake (Vanilla)", 
-        "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake"
-    }
-
     lines = text.splitlines()
     for line in lines:
         for item in valid_items:
@@ -44,21 +47,24 @@ def extract_items(text):
                 if qty_match:
                     qty = int(qty_match.group(1))
                     item_counts[item] += qty
-
     return item_counts
+
 
 def create_summary_page(date, item_summary):
     doc = fitz.open()
     page = doc.new_page()
     page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
     y = 100
-    for item, qty in sorted(item_summary.items()):
-        page.insert_text((50, y), f"{item}: {qty}", fontsize=12)
-        y += 20
+    for item in valid_items_order:
+        if item in item_summary:
+            qty = item_summary[item]
+            page.insert_text((50, y), f"{item}: {qty}", fontsize=12)
+            y += 20
     temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
     doc.save(temp_file.name)
     doc.close()
     return temp_file.name
+
 
 if uploaded_file is not None:
     st.success("PDF uploaded! Click the button below to start sorting.")
