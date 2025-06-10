@@ -27,10 +27,13 @@ def extract_date(text):
 def extract_items(text):
     item_counts = defaultdict(int)
     valid_items = {
-        "Maple Bar", "Chocolate Bar", "Raspberry Filled", "Cream Filled",
-        "Twist", "Apple Fritter", "Bear Claw", "Cin Roll", "Buttermilk Bar",
-        "Glazed Raised", "Old Fashioned", "Vanilla Cake", "Chocolate Cake",
-        "Sugar Raised", "Devils Food", "Coconut Bar"
+        "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled", "Raspberry Filled", 
+        "Lemon Filled", "Sugar Raised", "Twist", "Apple Fritter", "Raspberry Fritter", "Blueberry Fritter", "Bear Claw", 
+        "Frosted Claw", "Berry Claw, "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain), "French Cruller",
+        "French Cruller (Chocolate), "French Cruller (Maple), "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
+        "Old Fashioned (Maple)", Old Fashioned (Plain), "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
+        "Plain Cake with Choc Sprinkles", "Devil's Food", "Devil's Food with Sprinkles", "Coconut Cake (Vanilla)", 
+        "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake",
     }
 
     lines = text.splitlines()
@@ -47,7 +50,7 @@ def extract_items(text):
 def create_summary_page(date, item_summary):
     doc = fitz.open()
     page = doc.new_page()
-    page.insert_text((50, 50), f"Summary for {date.strftime('%m/%d/%Y')}", fontsize=14)
+    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
     y = 100
     for item, qty in item_summary.items():
         page.insert_text((50, y), f"{item}: {qty}", fontsize=12)
