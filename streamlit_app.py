@@ -131,7 +131,7 @@ if uploaded_file is not None:
 
             append_summary_to_pdf(sorted_pdf_path, summary_df, final_pdf_path)
 
-            st.success("✅ Done! Download your sorted + summarized PDF below:")
+            st.success("✅ Done! Download your sorted + summarized invoices below:")
             with open(final_pdf_path, "rb") as f:
                 st.download_button(
                     "📅 Download Final PDF with Totals Summary",
