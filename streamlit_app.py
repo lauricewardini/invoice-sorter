@@ -103,7 +103,7 @@ if uploaded_file is not None:
                 doc = fitz.open()
                 page = doc.new_page()
 
-                page.insert_text((50, 50), "TOTAL ITEMS SUMMARY", fontsize=16, bold=True)
+                page.insert_text((50, 50), "TOTAL ITEMS SUMMARY", fontsize=16)
 
                 y = 100
                 for index, row in summary_df.iterrows():
