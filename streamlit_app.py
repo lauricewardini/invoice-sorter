@@ -3,6 +3,9 @@ from PyPDF2 import PdfReader, PdfWriter
 from datetime import datetime
 import io
 import re
+import fitz  # PyMuPDF
+from tempfile import NamedTemporaryFile
+import pandas as pd
 
 st.set_page_config(page_title="🍩 Donut Land Invoice Sorter", layout="centered")
 st.title("🍩 Donut Land Invoice Sorter")
@@ -86,15 +89,54 @@ if uploaded_file is not None:
                 for page_index in page_indices:
                     writer.add_page(reader.pages[page_index])
 
-            output_pdf = io.BytesIO()
-            writer.write(output_pdf)
-            output_pdf.seek(0)
+            with NamedTemporaryFile(delete=False, suffix=".pdf") as temp_sorted_file:
+                writer.write(temp_sorted_file)
+                sorted_pdf_path = temp_sorted_file.name
 
-            st.success("✅ Done! Download your sorted PDF below:")
-            st.download_button(
-                label="📥 Download Sorted Invoices",
-                data=output_pdf,
-                file_name="sorted " + uploaded_file.name,
-            
-                mime="application/pdf"
-            )
+            # TEMP: Fake data for demo. Replace with actual quantity parsing later.
+            summary_df = pd.DataFrame({
+                "Item": ["Maple Bar", "Chocolate Bar", "Apple Fritter"],
+                "Total Quantity": [35, 50, 20]
+            })
+
+            def create_summary_pdf(summary_df):
+                doc = fitz.open()
+                page = doc.new_page()
+
+                page.insert_text((50, 50), "TOTAL ITEMS SUMMARY", fontsize=16, bold=True)
+
+                y = 100
+                for index, row in summary_df.iterrows():
+                    item = row['Item']
+                    qty = row['Total Quantity']
+                    page.insert_text((50, y), f"{item}: {qty}", fontsize=12)
+                    y += 20
+
+                temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
+                doc.save(temp_file.name)
+                doc.close()
+                return temp_file.name
+
+            def append_summary_to_pdf(original_pdf_path, summary_df, output_path):
+                main_doc = fitz.open(original_pdf_path)
+                summary_path = create_summary_pdf(summary_df)
+                summary_doc = fitz.open(summary_path)
+
+                main_doc.insert_pdf(summary_doc)
+                main_doc.save(output_path)
+                main_doc.close()
+
+            final_pdf_path = "invoices_with_summary.pdf"
+            final_filename = "sorted " + uploaded_file.name
+
+            append_summary_to_pdf(sorted_pdf_path, summary_df, final_pdf_path)
+
+            st.success("✅ Done! Download your sorted + summarized PDF below:")
+            with open(final_pdf_path, "rb") as f:
+                st.download_button(
+                    "📅 Download Final PDF with Totals Summary",
+                    f.read(),
+                    file_name=final_filename,
+                    mime="application/pdf"
+                )
+
