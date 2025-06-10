@@ -37,12 +37,13 @@ def extract_items(text):
 
     lines = text.splitlines()
     for line in lines:
-        match = re.match(r'^\s*(\d+)\s+([A-Za-z ]+)', line.strip())
-        if match:
-            qty = int(match.group(1))
-            item = match.group(2).strip().title()
-            if item in valid_items:
-                item_counts[item] += qty
+        for item in valid_items:
+            if item.lower() in line.lower():
+                # Try to extract the number from the same line
+                qty_match = re.search(r'(\d+)', line)
+                if qty_match:
+                    qty = int(qty_match.group(1))
+                    item_counts[item] += qty
 
     return item_counts
 
