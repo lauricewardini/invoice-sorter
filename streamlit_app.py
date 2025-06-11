@@ -14,13 +14,14 @@ st.write("Upload your QuickBooks invoices PDF and we’ll sort them by date and 
 uploaded_file = st.file_uploader("📄 Upload PDF", type=["pdf"])
 
 valid_items_order = [
-    "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled", "Raspberry Filled", 
+    "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled", "Maple Cream Filled", "Raspberry Filled", 
     "Lemon Filled", "Sugar Raised", "Twist", "Apple Fritter", "Raspberry Fritter", "Blueberry Fritter", "Bear Claw", 
-    "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller",
+    "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller (Glazed)",
     "French Cruller (Chocolate)", "French Cruller (Maple)", "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
-    "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
-    "Plain Cake with Choc Sprinkles", "Devil's Food", "Devil's Food with Sprinkles", "Coconut Cake (Vanilla)", 
-    "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake"
+    "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Coconut Cake (Vanilla", "Plain Cake w/ Choc Icing", 
+    "Plain Cake with Choc Sprinkles", "Chocolate Frosted Cake (NO SPRINKLES", "Devil's Food", "Devil's Food with Sprinkles", 
+    "Coconut Cake (Vanilla)", "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake", "Donuts", "Fancy Donuts", 
+    "Assorted Regular Donuts", "Assorted Fancy Donuts", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)", 
 ]
 valid_items = set(valid_items_order)
 
