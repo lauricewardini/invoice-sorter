@@ -71,6 +71,9 @@ def create_summary_page(date, item_summary):
 if uploaded_file is not None:
     try:
         vendor_df = pd.read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRHPqLmzPV7uNIhjfmvAtvr-1P1rs88LadRLAHoK4Q-QfTcimSo8_rD0FnUpURnjeda5b0UV9XD1Oyt/pub?output=csv")
+        # Drop any rows where required fields are missing or clearly invalid
+vendor_df = vendor_df.dropna(subset=['vendor name', 'packing note', 'route'])
+vendor_df = vendor_df[vendor_df['packing note'].str.lower().isin(['box', 'tray', 'morning'])]
         vendor_df.columns = [c.strip().lower() for c in vendor_df.columns]
         vendor_df['packing_note'] = vendor_df['packing note'].str.lower()
         vendor_df['route'] = vendor_df['route'].str.lower()
