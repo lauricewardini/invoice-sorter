@@ -7,13 +7,12 @@ import fitz  # PyMuPDF
 from tempfile import NamedTemporaryFile
 from collections import defaultdict, OrderedDict
 import pandas as pd
-import requests
+from rapidfuzz import process, fuzz
 
 st.set_page_config(page_title="🍩 Donut Land Invoice Sorter", layout="centered")
 st.title("🍩 Donut Land Invoice Sorter")
 st.write("This app automatically checks your live Google Sheet for the vendor order and sorts invoices according to date, packing note, route, and vendor order.")
 
-# Predefined link to Google Sheet CSV export
 GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHPqLmzPV7uNIhjfmvAtvr-1P1rs88LadRLAHoK4Q-QfTcimSo8_rD0FnUpURnjeda5b0UV9XD1Oyt/pub?output=csv"
 
 uploaded_file = st.file_uploader("📄 Upload QuickBooks Invoices PDF", type=["pdf"])
@@ -70,15 +69,12 @@ def create_summary_page(date, item_summary):
 
 if uploaded_file is not None:
     try:
-        vendor_df = pd.read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRHPqLmzPV7uNIhjfmvAtvr-1P1rs88LadRLAHoK4Q-QfTcimSo8_rD0FnUpURnjeda5b0UV9XD1Oyt/pub?output=csv", skiprows=1)
-        # Drop any rows where required fields are missing or clearly invalid
+        vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL, skiprows=1)
+        vendor_df.columns = [c.strip().lower() for c in vendor_df.columns]
         vendor_df = vendor_df.dropna(subset=['vendor name', 'packing note', 'route'])
         vendor_df = vendor_df[vendor_df['packing note'].str.lower().isin(['box', 'tray', 'morning'])]
-        vendor_df.columns = [c.strip().lower() for c in vendor_df.columns]
-        vendor_df['packing_note'] = vendor_df['packing note'].str.lower()
-        vendor_df['route'] = vendor_df['route'].str.lower()
+
         vendor_df['vendor_name'] = vendor_df['vendor name'].str.lower()
-        vendor_df['sort_key'] = vendor_df['packing_note'] + '-' + vendor_df['route'] + '-' + vendor_df['vendor_name']
         vendor_rank = {row['vendor_name']: i for i, row in vendor_df.iterrows()}
 
         st.success("PDF uploaded! Click the button below to start sorting.")
@@ -130,9 +126,11 @@ if uploaded_file is not None:
                                 current_invoice['note'] = 'tray'
                             elif 'morning' in l_lower:
                                 current_invoice['note'] = 'morning'
-                            for v in vendor_rank:
-                                if v in l_lower:
-                                    current_invoice['vendor'] = v
+                            match = process.extractOne(
+                                l_lower, list(vendor_rank.keys()), scorer=fuzz.partial_ratio
+                            )
+                            if match and match[1] > 80:
+                                current_invoice['vendor'] = match[0]
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
                             elif 'route 2' in l_lower:
@@ -195,3 +193,4 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
+
