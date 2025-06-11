@@ -139,7 +139,7 @@ if uploaded_file is not None:
                                 current_invoice['note'] = 'morning'
 
                             match, score, _ = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
-                            if score > 85:
+                            if score > 90:
                                 current_invoice['vendor'] = match.lower()
 
                             if 'route 1' in l_lower:
