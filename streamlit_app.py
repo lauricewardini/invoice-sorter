@@ -137,10 +137,11 @@ if uploaded_file is not None:
                                 current_invoice['note'] = 'tray'
                             elif 'morning' in l_lower:
                                 current_invoice['note'] = 'morning'
-                            for known_vendor in vendor_rank:
-                                match, score, _ = process.extractOne(l_lower, [known_vendor], scorer=fuzz.partial_ratio)
-                                if score > 85:
-                                    current_invoice['vendor'] = known_vendor
+
+                            match, score, _ = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
+                            if score > 85:
+                                current_invoice['vendor'] = match.lower()
+
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
                             elif 'route 2' in l_lower:
@@ -161,7 +162,12 @@ if uploaded_file is not None:
                         current_invoice['items']
                     ))
 
-                sorted_invoices = sorted(invoice_data, key=lambda x: (x[0], x[1], x[2], x[3]))
+                sorted_invoices = sorted(invoice_data, key=lambda x: (
+                    x[0],  # date
+                    normalize_packing_note(x[1]),  # normalized packing note
+                    x[2].lower(),  # route
+                    x[3]  # vendor rank
+                ))
 
                 writer = PdfWriter()
                 reader_pages = reader.pages
@@ -203,3 +209,4 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
+
