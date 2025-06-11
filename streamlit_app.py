@@ -13,7 +13,6 @@ st.set_page_config(page_title="🍩 Donut Land Invoice Sorter", layout="centered
 st.title("🍩 Donut Land Invoice Sorter")
 st.write("This app automatically checks your live Google Sheet for the vendor order and sorts invoices according to date, packing note, route, and vendor order.")
 
-# Predefined link to Google Sheet CSV export
 GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHPqLmzPV7uNIhjfmvAtvr-1P1rs88LadRLAHoK4Q-QfTcimSo8_rD0FnUpURnjeda5b0UV9XD1Oyt/pub?output=csv"
 
 uploaded_file = st.file_uploader("📄 Upload QuickBooks Invoices PDF", type=["pdf"])
@@ -81,15 +80,19 @@ def create_summary_page(date, item_summary):
 if uploaded_file is not None:
     try:
         vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL, skip_blank_lines=True)
-        # Clean up and lowercase column names
         vendor_df.columns = [c.strip().lower() for c in vendor_df.columns]
-        # Drop rows where vendor name is missing
-        vendor_df = vendor_df[vendor_df['vendor name'].notna()]
-        vendor_df['packing_note'] = vendor_df['packing note'].apply(normalize_packing_note)
-        vendor_df['route'] = vendor_df['route'].str.lower()
-        vendor_df['vendor_name'] = vendor_df['vendor name'].str.lower()
+        vendor_df.rename(columns={
+            "vendor name": "vendor_name",
+            "packing note": "packing_note",
+            "route": "route"
+        }, inplace=True)
+
+        vendor_df = vendor_df[vendor_df["vendor_name"].notna()]
+        vendor_df["packing_note"] = vendor_df["packing_note"].apply(normalize_packing_note)
+        vendor_df["route"] = vendor_df["route"].str.lower()
+        vendor_df["vendor_name"] = vendor_df["vendor_name"].str.lower()
         vendor_df = vendor_df.reset_index(drop=True)
-        vendor_rank = {row['vendor_name']: i for i, row in vendor_df.iterrows()}
+        vendor_rank = {row["vendor_name"]: i for i, row in vendor_df.iterrows()}
 
         st.success("PDF uploaded! Click the button below to start sorting.")
         if st.button("🔃 Sort My Invoices"):
@@ -198,7 +201,7 @@ if uploaded_file is not None:
 
                 st.success("✅ Done! Download your sorted PDF with daily summaries below:")
                 st.download_button(
-                    "🗕️ Download PDF with Daily Donut Totals",
+                    "🕅️ Download PDF with Daily Donut Totals",
                     open(temp_output_path, "rb"),
                     file_name="sorted " + uploaded_file.name,
                     mime="application/pdf"
@@ -206,5 +209,6 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
+
 
 
