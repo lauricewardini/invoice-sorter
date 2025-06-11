@@ -80,7 +80,7 @@ if uploaded_file is not None:
         vendor_df['route'] = vendor_df['route'].str.lower()
         vendor_df['vendor_name'] = vendor_df['vendor name'].str.lower()
         vendor_df['sort_key'] = vendor_df['packing_note'] + '-' + vendor_df['route'] + '-' + vendor_df['vendor_name']
-        vendor_rank = {row['vendor_name']: i for i, row in vendor_df.sort_values('sort_key').iterrows()}
+        vendor_rank = {row['vendor_name']: i for i, row in vendor_df.iterrows()}
 
         st.success("PDF uploaded! Click the button below to start sorting.")
         if st.button("🔃 Sort My Invoices"):
