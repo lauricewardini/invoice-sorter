@@ -81,11 +81,10 @@ def create_summary_page(date, item_summary):
 if uploaded_file is not None:
     try:
         vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL, skip_blank_lines=True)
-        vendor_df = vendor_df[vendor_df['Vendor Name'].notna()]  # Drop section headers or blanks
+        # Clean up and lowercase column names
         vendor_df.columns = [c.strip().lower() for c in vendor_df.columns]
-        vendor_df.columns = ["vendor name", "packing note", "route"]
-        vendor_df = vendor_df.dropna(subset=['vendor name'])
-
+        # Drop rows where vendor name is missing
+        vendor_df = vendor_df[vendor_df['vendor name'].notna()]
         vendor_df['packing_note'] = vendor_df['packing note'].apply(normalize_packing_note)
         vendor_df['route'] = vendor_df['route'].str.lower()
         vendor_df['vendor_name'] = vendor_df['vendor name'].str.lower()
