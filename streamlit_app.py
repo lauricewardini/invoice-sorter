@@ -79,14 +79,8 @@ def create_summary_page(date, item_summary):
 
 if uploaded_file is not None:
     try:
-        vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL, skip_blank_lines=True)
-        vendor_df.columns = [c.strip().lower() for c in vendor_df.columns]
-        vendor_df.rename(columns={
-            "vendor name": "vendor_name",
-            "packing note": "packing_note",
-            "route": "route"
-        }, inplace=True)
-
+        vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL, skiprows=1)
+        vendor_df.columns = [c.strip().lower().replace(" ", "_") for c in vendor_df.columns]
         vendor_df = vendor_df[vendor_df["vendor_name"].notna()]
         vendor_df["packing_note"] = vendor_df["packing_note"].apply(normalize_packing_note)
         vendor_df["route"] = vendor_df["route"].str.lower()
@@ -209,6 +203,3 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
-
-
-
