@@ -13,6 +13,7 @@ st.set_page_config(page_title="🍩 Donut Land Invoice Sorter", layout="centered
 st.title("🍩 Donut Land Invoice Sorter")
 st.write("This app automatically checks your live Google Sheet for the vendor order and sorts invoices according to date, packing note, route, and vendor order.")
 
+# Predefined link to Google Sheet CSV export
 GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHPqLmzPV7uNIhjfmvAtvr-1P1rs88LadRLAHoK4Q-QfTcimSo8_rD0FnUpURnjeda5b0UV9XD1Oyt/pub?output=csv"
 
 uploaded_file = st.file_uploader("📄 Upload QuickBooks Invoices PDF", type=["pdf"])
@@ -28,6 +29,16 @@ valid_items_order = [
     "Assorted Regular Donuts", "Assorted Fancy Donuts", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)", "Mixed Muffins"
 ]
 valid_items = set(valid_items_order)
+
+def normalize_packing_note(note):
+    note = str(note).lower()
+    if "box" in note:
+        return "box"
+    elif "tray" in note:
+        return "tray"
+    elif "morning" in note:
+        return "morning"
+    return note
 
 def extract_date(text):
     match = re.search(r'(\d{1,2}/\d{1,2}/\d{2,4})', text)
@@ -69,12 +80,14 @@ def create_summary_page(date, item_summary):
 
 if uploaded_file is not None:
     try:
-        vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL, skiprows=1)
-        vendor_df.columns = [c.strip().lower() for c in vendor_df.columns]
-        vendor_df = vendor_df.dropna(subset=['vendor name', 'packing note', 'route'])
-        vendor_df = vendor_df[vendor_df['packing note'].str.lower().isin(['box', 'tray', 'morning'])]
+        vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL)
+        vendor_df.columns = [c.strip().lower() for c in vendor_df.columns if c.strip()]
+        vendor_df = vendor_df.dropna(subset=['vendor name'])
 
+        vendor_df['packing_note'] = vendor_df['packing note'].apply(normalize_packing_note)
+        vendor_df['route'] = vendor_df['route'].str.lower()
         vendor_df['vendor_name'] = vendor_df['vendor name'].str.lower()
+        vendor_df = vendor_df.reset_index(drop=True)
         vendor_rank = {row['vendor_name']: i for i, row in vendor_df.iterrows()}
 
         st.success("PDF uploaded! Click the button below to start sorting.")
@@ -126,11 +139,10 @@ if uploaded_file is not None:
                                 current_invoice['note'] = 'tray'
                             elif 'morning' in l_lower:
                                 current_invoice['note'] = 'morning'
-                            match = process.extractOne(
-                                l_lower, list(vendor_rank.keys()), scorer=fuzz.partial_ratio
-                            )
-                            if match and match[1] > 80:
-                                current_invoice['vendor'] = match[0]
+                            for known_vendor in vendor_rank:
+                                match, score = process.extractOne(l_lower, [known_vendor], scorer=fuzz.partial_ratio)
+                                if score > 85:
+                                    current_invoice['vendor'] = known_vendor
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
                             elif 'route 2' in l_lower:
@@ -193,4 +205,5 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
+
 
