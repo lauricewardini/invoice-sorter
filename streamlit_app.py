@@ -29,6 +29,9 @@ valid_items_order = [
 ]
 valid_items = set(valid_items_order)
 
+packing_note_order = {'box': 0, 'tray': 1, 'morning': 2}
+route_order = {'route 1': 0, 'route 2': 1}
+
 def normalize_packing_note(note):
     note = str(note).lower()
     if "box" in note:
@@ -140,7 +143,7 @@ if uploaded_file is not None:
 
                             match, score, _ = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
                             if score > 90:
-                                current_invoice['vendor'] = match.lower()
+                                current_invoice['vendor'] = match.strip().lower()
 
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
@@ -163,10 +166,10 @@ if uploaded_file is not None:
                     ))
 
                 sorted_invoices = sorted(invoice_data, key=lambda x: (
-                    x[0],  # date
-                    normalize_packing_note(x[1]),  # normalized packing note
-                    x[2].lower(),  # route
-                    x[3]  # vendor rank
+                    x[0],
+                    packing_note_order.get(x[1], 99),
+                    route_order.get(x[2], 99),
+                    x[3]
                 ))
 
                 writer = PdfWriter()
@@ -209,4 +212,3 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
-
