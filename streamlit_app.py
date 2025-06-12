@@ -145,8 +145,7 @@ if uploaded_file is not None:
                             if match_result:
                              match, score, _ = match_result
                             if score > 90:
-                            current_invoice['vendor'] = match  # Don't lowercase — use the exact matched vendor key from vendor_rank
-
+                                current_invoice['vendor'] = match  # Don't lowercase — use the exact matched vendor key from vendor_rank
 
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
