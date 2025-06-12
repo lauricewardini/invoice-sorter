@@ -141,9 +141,12 @@ if uploaded_file is not None:
                             elif 'morning' in l_lower:
                                 current_invoice['note'] = 'morning'
 
-                            match, score, _ = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
+                            match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
+                            if match_result:
+                             match, score, _ = match_result
                             if score > 90:
-                                current_invoice['vendor'] = match.strip().lower()
+                            current_invoice['vendor'] = match  # Don't lowercase — use the exact matched vendor key from vendor_rank
+
 
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
