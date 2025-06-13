@@ -70,13 +70,13 @@ def create_summary_page(date, item_summary):
     page = doc.new_page()
     page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
 
-    col1_x, col2_x = 50, 300  # x-coordinates for left and right columns
+    col1_x, col2_x = 50, 300
     y_start = 100
     y_step = 20
-    y_limit = 700  # height cutoff before wrapping to second column
+    y_limit = 700
 
     y = y_start
-    col = 0  # 0 for left, 1 for right
+    col = 0
 
     for item in valid_items_order:
         if item in item_summary:
@@ -145,6 +145,7 @@ if uploaded_file is not None:
                             'pages': [i],
                             'items': extract_items(text)
                         }
+
                         for l in lines:
                             l_lower = l.lower()
                             if 'box' in l_lower:
@@ -154,31 +155,23 @@ if uploaded_file is not None:
                             elif 'morning' in l_lower:
                                 current_invoice['note'] = 'morning'
 
-                    try:
-                        # Try exact match first
-                        matched_vendor = next((v for v in vendor_rank if v.lower() in l_lower), None)
-
-                        # If no exact match, use fuzzy matching
-                        if not matched_vendor:
-                            match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
-                            if match_result:
-                                match, score, _ = match_result
-                                if score > 90:
-                                    matched_vendor = match
-
-                        if matched_vendor:
-                            current_invoice['vendor'] = matched_vendor
-
-                    except Exception as e:
-                        print(f"Vendor matching error on line: {l} -> {e}")
-
-                except Exception as e:
-                    print(f"Vendor matching error on line: {l} -> {e}")
-
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
                             elif 'route 2' in l_lower:
                                 current_invoice['route'] = 'route 2'
+
+                            try:
+                                matched_vendor = next((v for v in vendor_rank if v.lower() in l_lower), None)
+                                if not matched_vendor:
+                                    match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
+                                    if match_result:
+                                        match, score, _ = match_result
+                                        if score > 90:
+                                            matched_vendor = match
+                                if matched_vendor:
+                                    current_invoice['vendor'] = matched_vendor
+                            except Exception as e:
+                                print(f"Vendor matching error on line: {l} -> {e}")
                     else:
                         current_invoice['pages'].append(i)
                         page_items = extract_items(text)
@@ -234,7 +227,7 @@ if uploaded_file is not None:
 
                 st.success("✅ Done! Download your sorted PDF with daily summaries below:")
                 st.download_button(
-                    "🕅️ Download PDF with Daily Donut Totals",
+                    "🔄️ Download PDF with Daily Donut Totals",
                     open(temp_output_path, "rb"),
                     file_name="sorted " + uploaded_file.name,
                     mime="application/pdf"
@@ -242,3 +235,4 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
+
