@@ -29,7 +29,7 @@ valid_items_order = [
 ]
 valid_items = set(valid_items_order)
 
-packing_note_order = {'box': 0, 'tray': 1, 'morning': 2}
+packing_note_order = {'morning': 0, 'box': 1, 'tray': 2}
 route_order = {'route 1': 0, 'route 2': 1}
 
 def normalize_packing_note(note):
