@@ -69,12 +69,25 @@ def create_summary_page(date, item_summary):
     doc = fitz.open()
     page = doc.new_page()
     page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
-    y = 100
+
+    col1_x, col2_x = 50, 300  # horizontal positions for each column
+    y_start = 100
+    y_step = 20
+    y_limit = 700  # max Y position before jumping to column 2
+
+    y = y_start
+    col = 0  # 0 for left, 1 for right
+
     for item in valid_items_order:
         if item in item_summary:
             qty = item_summary[item]
-            page.insert_text((50, y), f"{item}: {qty}", fontsize=12)
-            y += 20
+            x = col1_x if col == 0 else col2_x
+            page.insert_text((x, y), f"{item}: {qty}", fontsize=12)
+            y += y_step
+            if y > y_limit and col == 0:
+                y = y_start
+                col = 1
+
     temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
     doc.save(temp_file.name)
     doc.close()
