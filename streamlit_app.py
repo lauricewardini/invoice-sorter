@@ -154,23 +154,23 @@ if uploaded_file is not None:
                             elif 'morning' in l_lower:
                                 current_invoice['note'] = 'morning'
 
-                           try:
-    # Try exact match first
-    matched_vendor = next((v for v in vendor_rank if v.lower() in l_lower), None)
+                                            try:
+                    # Try exact match first
+                    matched_vendor = next((v for v in vendor_rank if v.lower() in l_lower), None)
 
-    # If no exact match, use fuzzy matching
-    if not matched_vendor:
-        match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
-        if match_result:
-            match, score, _ = match_result
-            if score > 90:
-                matched_vendor = match
+                    # If no exact match, use fuzzy matching
+                    if not matched_vendor:
+                        match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
+                        if match_result:
+                            match, score, _ = match_result
+                            if score > 90:
+                                matched_vendor = match
 
-    if matched_vendor:
-        current_invoice['vendor'] = matched_vendor
+                    if matched_vendor:
+                        current_invoice['vendor'] = matched_vendor
 
-except Exception as e:
-    print(f"Vendor matching error on line: {l} -> {e}")
+                except Exception as e:
+                    print(f"Vendor matching error on line: {l} -> {e}")
 
                             if 'route 1' in l_lower:
                                 current_invoice['route'] = 'route 1'
