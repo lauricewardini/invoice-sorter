@@ -154,7 +154,7 @@ if uploaded_file is not None:
                             elif 'morning' in l_lower:
                                 current_invoice['note'] = 'morning'
 
-                        try:
+                    try:
                         # Try exact match first
                         matched_vendor = next((v for v in vendor_rank if v.lower() in l_lower), None)
 
