@@ -159,16 +159,9 @@ if uploaded_file is not None:
                                 current_invoice['route'] = 'route 1'
                             elif 'route 2' in l_lower:
                                 current_invoice['route'] = 'route 2'
-                                
-                                try:
-                                    match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.token_sort_ratio)
-                                    if match_result:
-                                        match, score, _ = match_result
-                                        if score >= 95:
-                                            current_invoice['vendor'] = match
-                                except Exception as e:
-                                    print(f"Vendor matching error on line: {l} -> {e}")
 
+                            try:
+                                matched_vendor = next((v for v in vendor_rank if v.lower() in l_lower), None)
                                 if not matched_vendor:
                                     match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
                                     if match_result:
@@ -240,6 +233,8 @@ if uploaded_file is not None:
                     mime="application/pdf"
                 )
 
+    except Exception as e:
+        st.error(f"❌ Error processing file: {e}")
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
 
