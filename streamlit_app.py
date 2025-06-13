@@ -177,8 +177,7 @@ if uploaded_file is not None:
                                             matched_vendor = match
                                 if matched_vendor:
                                     current_invoice['vendor'] = matched_vendor
-                            except Exception as e:
-                                print(f"Vendor matching error on line: {l} -> {e}")
+                
                     else:
                         current_invoice['pages'].append(i)
                         page_items = extract_items(text)
