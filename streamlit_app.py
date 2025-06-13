@@ -70,10 +70,10 @@ def create_summary_page(date, item_summary):
     page = doc.new_page()
     page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
 
-    col1_x, col2_x = 50, 300  # horizontal positions for each column
+    col1_x, col2_x = 50, 300  # x-coordinates for left and right columns
     y_start = 100
     y_step = 20
-    y_limit = 700  # max Y position before jumping to column 2
+    y_limit = 700  # height cutoff before wrapping to second column
 
     y = y_start
     col = 0  # 0 for left, 1 for right
