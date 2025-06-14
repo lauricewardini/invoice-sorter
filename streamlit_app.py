@@ -82,6 +82,7 @@ def extract_items(text):
     return item_counts
 
 def create_summary_page(date, item_summary):
+    import math
     doc = fitz.open()
     page = doc.new_page()
     page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
@@ -96,31 +97,24 @@ def create_summary_page(date, item_summary):
 
     for item in valid_items_order:
         if item in item_summary:            
-             qty = item_summary[item]
-
-             # Calculate screens if item has a per-screen value
-        if item in donuts_per_screen:
-            import math
+            qty = item_summary[item]
 
             if item in donuts_per_screen:
                 screens_raw = qty / donuts_per_screen[item]
                 screens = math.ceil(screens_raw * 2) / 2
+                screens_display = str(int(screens)) if screens.is_integer() else str(screens)
+                label = f"{item}: {screens_display} screens"
+            else:
+                qty_display = str(int(qty)) if isinstance(qty, (int, float)) and qty == int(qty) else str(qty)
+                label = f"{item}: {qty_display} donuts"
 
-            # Remove .0 if whole
-            screens_display = str(int(screens)) if screens.is_integer() else str(screens)
-            label = f"{item}: {screens_display} screens"
-        else:
-            # Just in case qty is ever a float, make it clean too
-            qty_display = str(int(qty)) if isinstance(qty, (int, float)) and qty == int(qty) else str(qty)
-            label = f"{item}: {qty_display} donuts"
-                
-        x = col1_x if col == 0 else col2_x
-        page.insert_text((x, y), label, fontsize=12)
-        y += y_step
+            x = col1_x if col == 0 else col2_x
+            page.insert_text((x, y), label, fontsize=12)
+            y += y_step
 
-        if y > y_limit and col == 0:
-            y = y_start
-            col = 1
+            if y > y_limit and col == 0:
+                y = y_start
+                col = 1
 
     temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
     doc.save(temp_file.name)
