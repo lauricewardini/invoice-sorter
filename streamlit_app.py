@@ -23,7 +23,7 @@ valid_items_order = [
     "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller (Glazed)",
     "French Cruller (Chocolate)", "French Cruller (Maple)", "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
     "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
-    "Plain Cake w/ Choc Sprinkles", "Chocolate Frosted Cake (NO SPRINKLES)", "Devil's Food", "Devil's Food with Sprinkles", 
+    "Plain Cake with Choc Sprinkles", "Chocolate Frosted Cake (NO SPRINKLES)", "Devil's Food", "Devil's Food with Sprinkles", 
     "Coconut Cake (Vanilla)", "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake", "Donuts", "Fancy Donuts", 
     "Assorted Regular Donuts", "Assorted Fancy Donuts", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)", "Mixed Muffins"
 ]
@@ -116,7 +116,7 @@ def create_summary_page(date, item_summary):
         "Cake Donuts": [
             "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", "Old Fashioned (Maple)",
             "Old Fashioned (Plain)", "Devil's Food", "Devil's Food with Sprinkles", "Plain Cake", 
-            "Plain Cake w/ Choc Icing", "Plain Cake w/ Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
+            "Plain Cake w/ Choc Icing", "Plain Cake with Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
             "Coconut Cake (Vanilla)", "Chocolate Frosted Cake (NO SPRINKLES)", "Blueberry Cake", "Cinnamon Crumb", 
             "Glazed Cake Donut", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)"
         ]
