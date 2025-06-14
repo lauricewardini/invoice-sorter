@@ -77,19 +77,17 @@ def extract_items(text):
         line_lower = line.lower()
 
         for original_item in valid_items_order:
-            item_lower = original_item.lower()
+            item_lower = re.escape(original_item.lower())
 
-            # Match only if line starts with the item + space, tab, or ends immediately
-            if (line_lower.startswith(item_lower + " ")
-                or line_lower.startswith(item_lower + "\t")
-                or line_lower == item_lower):
-                
+            # Match item as a full phrase with boundaries (start/end or non-word chars)
+            pattern = rf'(^|\W){item_lower}(\W|$)'
+            if re.search(pattern, line_lower):
                 qty_match = re.search(r'(\d+)', line)
                 if qty_match:
                     qty = int(qty_match.group(1))
                     item_counts[original_item] += qty
-                    # Optional debug
-                    # print(f"Matched: {original_item} in line: '{line.strip()}' → Qty: {qty}")
+                    # Debug:
+                    # print(f"✔ Matched '{original_item}' in: {line.strip()} → Qty: {qty}")
 
     return item_counts
 
