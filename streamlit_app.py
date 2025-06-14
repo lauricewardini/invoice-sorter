@@ -67,18 +67,21 @@ def extract_date(text):
                 continue
     return datetime(1900, 1, 1).date()
 
+valid_items = set(i.lower() for i in valid_items_order)
+
 def extract_items(text):
     item_counts = defaultdict(int)
     lines = text.splitlines()
     for line in lines:
+        line_lower = line.lower()
         for item in valid_items:
-            pattern = r'\b' + re.escape(item.lower()) + r'\b'
-            if re.search(pattern, line.lower()):
+            if item in line_lower:
                 qty_match = re.search(r'(\d+)', line)
                 if qty_match:
                     qty = int(qty_match.group(1))
-                    item_counts[item] += qty  # ✅ This is correctly scoped
-                    print(f"Matched '{item}' in line: '{line.strip()}' with qty {qty}")
+                    # Find the original cased item for display
+                    original_item = next((i for i in valid_items_order if i.lower() == item), item)
+                    item_counts[original_item] += qty
     return item_counts
 
 def create_summary_page(date, item_summary):
