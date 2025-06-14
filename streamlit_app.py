@@ -108,7 +108,7 @@ def create_summary_page(date, item_summary):
         "Cake Donuts": [
             "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", "Old Fashioned (Maple)",
             "Old Fashioned (Plain)", "Devil's Food", "Devil's Food with Sprinkles", "Plain Cake", 
-            "Plain Cake w/ Choc Icing", "Plain Cake with Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
+            "Plain Cake w/ Choc Icing", "Plain Cake w/ Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
             "Coconut Cake (Vanilla)", "Chocolate Frosted Cake (NO SPRINKLES)", "Blueberry Cake", "Cinnamon Crumb", 
             "Glazed Cake Donut", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)"
         ]
