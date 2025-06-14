@@ -152,16 +152,6 @@ def create_summary_page(date, item_summary):
     doc.close()
     return temp_file.name
 
-            y += y_step
-            if y > y_limit and col == 0:
-                y = y_start
-                col = 1
-
-    temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
-    doc.save(temp_file.name)
-    doc.close()
-    return temp_file.name
-
 if uploaded_file is not None:
     try:
         vendor_df = pd.read_csv(GOOGLE_SHEET_CSV_URL, skiprows=1)
