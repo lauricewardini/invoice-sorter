@@ -161,25 +161,25 @@ if uploaded_file is not None:
                                 current_invoice['route'] = 'route 2'
 
                             try:
-    matched_vendor = None
+                                matched_vendor = None
 
-    # Exact match by line containing the full vendor name (safer)
-    for vendor in vendor_rank:
-        vendor_clean = vendor.strip().lower()
-        if vendor_clean and vendor_clean in l_lower:
-            matched_vendor = vendor
-            break
+                                # Exact match by line containing the full vendor name (safer)
+                                for vendor in vendor_rank:
+                                    vendor_clean = vendor.strip().lower()
+                                    if vendor_clean and vendor_clean in l_lower:
+                                        matched_vendor = vendor
+                                        break
 
-    # Fallback to fuzzy match only if exact match fails
-    if not matched_vendor:
-        match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.token_sort_ratio)
-        if match_result:
-            match, score, _ = match_result
-            if score >= 95:
-                matched_vendor = match
+                                # Fallback to fuzzy match only if exact match fails
+                                if not matched_vendor:
+                                    match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.token_sort_ratio)
+                                    if match_result:
+                                        match, score, _ = match_result
+                                        if score >= 95:
+                                            matched_vendor = match
 
-    if matched_vendor:
-        current_invoice['vendor'] = matched_vendor
+                                if matched_vendor:
+                                    current_invoice['vendor'] = matched_vendor
 except Exception as e:
     print(f"Vendor matching error on line: {l} -> {e}")
 
