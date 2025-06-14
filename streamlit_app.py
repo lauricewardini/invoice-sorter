@@ -78,6 +78,7 @@ def extract_items(text):
                 if qty_match:
                     qty = int(qty_match.group(1))
                     item_counts[item] += qty  # ✅ This is correctly scoped
+                    print(f"Matched '{item}' in line: '{line.strip()}' with qty {qty}")
     return item_counts
 
 def create_summary_page(date, item_summary):
