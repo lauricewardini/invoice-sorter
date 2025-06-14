@@ -75,13 +75,17 @@ def extract_items(text):
     for line in lines:
         line_lower = line.lower()
         for original_item in valid_items_order:
-            pattern = r'\b' + re.escape(original_item.lower()) + r'\b'
-            if re.search(pattern, line_lower):
-                qty_match = re.search(r'(\d+)', line)
-                if qty_match:
-                    qty = int(qty_match.group(1))
-                    item_counts[original_item] += qty
-
+            item_lower = original_item.lower()
+            if item_lower in line_lower:
+                # Use stricter match: look for exact phrase, not substring
+                # Only match if item appears as a whole word chunk
+                pattern = re.escape(item_lower)
+                match = re.search(rf'\b{pattern}\b', line_lower)
+                if match:
+                    qty_match = re.search(r'(\d+)', line)
+                    if qty_match:
+                        qty = int(qty_match.group(1))
+                        item_counts[original_item] += qty
     return item_counts
 
 def create_summary_page(date, item_summary):
