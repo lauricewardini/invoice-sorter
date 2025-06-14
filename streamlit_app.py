@@ -22,7 +22,7 @@ valid_items_order = [
     "Lemon Filled", "Sugar Raised", "Twist", "Apple Fritter", "Raspberry Fritter", "Blueberry Fritter", "Bear Claw", 
     "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller (Glazed)",
     "French Cruller (Chocolate)", "French Cruller (Maple)", "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
-    "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Coconut Cake (Vanilla", "Plain Cake w/ Choc Icing", 
+    "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Plain Cake w/ Choc Icing", 
     "Plain Cake with Choc Sprinkles", "Chocolate Frosted Cake (NO SPRINKLES)", "Devil's Food", "Devil's Food with Sprinkles", 
     "Coconut Cake (Vanilla)", "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake", "Donuts", "Fancy Donuts", 
     "Assorted Regular Donuts", "Assorted Fancy Donuts", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)", "Mixed Muffins"
@@ -336,7 +336,3 @@ if uploaded_file is not None:
 
     except Exception as e:
         st.error(f"❌ Error processing file: {e}")
-    except Exception as e:
-        st.error(f"❌ Error processing file: {e}")
-
-
