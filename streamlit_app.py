@@ -86,41 +86,96 @@ def extract_items(text):
 
 def create_summary_page(date, item_summary):
     import math
+
+    # Define categories
+    category_mapping = {
+        "Fancy Donuts": {
+            "Apple Fritter", "Bear Claw", "Frosted Claw", "Berry Claw", "Raspberry Fritter",
+            "Blueberry Fritter", "Cin Roll", "Frosted Roll", "Twist", "Buttermilk Bar (Glazed)", 
+            "Buttermilk Bar (Plain)"
+        },
+        "Raised Donuts": {
+            "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled",
+            "Raspberry Filled", "Lemon Filled", "Sugar Raised", "French Cruller (Glazed)",
+            "French Cruller (Chocolate)", "French Cruller (Maple)"
+        },
+        "Cake Donuts": {
+            "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", "Old Fashioned (Maple)",
+            "Old Fashioned (Plain)", "Devil's Food", "Devil's Food with Sprinkles", "Plain Cake", "Plain Cake w/ Choc Icing",
+            "Plain Cake with Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
+            "Coconut Cake (Vanilla)", "Chocolate Frosted Cake (NO SPRINKLES)",
+            "Blueberry Cake", "Cinnamon Crumb", "Glazed Cake Donut"
+        }
+    }
+
+    # Determine category for each item
+    item_to_category = {}
+    for cat, items in category_mapping.items():
+        for item in items:
+            item_to_category[item] = cat
+
+    # Default: anything not mapped goes into "Other"
+    categorized_items = {
+        "Fancy Donuts": [],
+        "Raised Donuts": [],
+        "Cake Donuts": [],
+        "Other": []
+    }
+
+    for item in item_summary:
+        category = item_to_category.get(item, "Other")
+        categorized_items[category].append((item, item_summary[item]))
+
+    # Start PDF page
     doc = fitz.open()
     page = doc.new_page()
-    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
+    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14, fontname="helv", bold=True)
 
     col1_x, col2_x = 50, 300
     y_start = 100
     y_step = 20
-    y_limit = 700
+    y_limit = 750
 
     y = y_start
-    col = 0
 
-    for item in valid_items_order:
-        if item in item_summary:            
-            qty = item_summary[item]
+    for category, items in categorized_items.items():
+        if not items:
+            continue
 
+        # Category Header
+        page.insert_text((50, y), category, fontsize=13, bold=True)
+        y += y_step
+
+        # Horizontal divider line
+        page.draw_line((50, y), (550, y))
+        y += y_step
+
+        # Two-column layout
+        col = 0
+        for item, qty in items:
             if item in donuts_per_screen:
                 screens_raw = qty / donuts_per_screen[item]
                 screens = math.ceil(screens_raw * 2) / 2
                 screens_display = str(int(screens)) if screens.is_integer() else str(screens)
                 unit = "screen" if screens_display == "1" else "screens"
                 label = f"{item}: {screens_display} {unit}"
-                
             else:
                 qty_display = str(int(qty)) if isinstance(qty, (int, float)) and qty == int(qty) else str(qty)
                 unit = "donut" if qty_display == "1" else "donuts"
                 label = f"{item}: {qty_display} {unit}"
 
             x = col1_x if col == 0 else col2_x
-            page.insert_text((x, y), label, fontsize=12)
-            y += y_step
+            page.insert_text((x, y), label, fontsize=11)
 
-            if y > y_limit and col == 0:
+            if col == 1:
+                y += y_step
+            col = (col + 1) % 2
+
+            if y > y_limit:
+                page = doc.new_page()
                 y = y_start
-                col = 1
+
+        y += y_step  # Extra space after each category
 
     temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
     doc.save(temp_file.name)
