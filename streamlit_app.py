@@ -23,11 +23,61 @@ valid_items_order = [
     "Frosted Claw", "Berry Claw", "Cin Roll", "Frosted Roll", "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)", "French Cruller (Glazed)",
     "French Cruller (Chocolate)", "French Cruller (Maple)", "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", 
     "Old Fashioned (Maple)", "Old Fashioned (Plain)", "Rainbow Sprinkle Cake (Vanilla)", "Coconut Cake (Vanilla", "Plain Cake w/ Choc Icing", 
-    "Plain Cake with Choc Sprinkles", "Chocolate Frosted Cake (NO SPRINKLES", "Devil's Food", "Devil's Food with Sprinkles", 
+    "Plain Cake with Choc Sprinkles", "Chocolate Frosted Cake (NO SPRINKLES)", "Devil's Food", "Devil's Food with Sprinkles", 
     "Coconut Cake (Vanilla)", "Cinnamon Crumb", "Blueberry Cake", "Glazed Cake Donut", "Plain Cake", "Donuts", "Fancy Donuts", 
     "Assorted Regular Donuts", "Assorted Fancy Donuts", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)", "Mixed Muffins"
 ]
 valid_items = set(valid_items_order)
+
+donuts_per_screen = {
+    "Maple Bar": 20,
+    "Chocolate Bar": 20,
+    "Tiger Bar": 20 
+    "Glazed Raised": 35,
+    "Chocolate Raised": 35,
+    "Cream Filled": 35,
+    "Maple Cream Filled": 35
+    "Raspberry Filled": 35,
+    "Lemon Filled": 35, 
+    "Sugar Raised": 35, 
+    "Twist": 20,
+    "Apple Fritter": 20,
+    "Raspberry Fritter": 20,
+    "Blueberry Fritter": 20,
+    "Bear Claw": 20,
+    "Frosted Claw": 20, 
+    "Berry Claw": 20,
+    "Cin Roll": 20,
+    "Frosted Roll": 20, 
+    "Buttermilk Bar (Glazed)": 20,
+    "Buttermilk Bar (Plain)": 20, 
+    "French Cruller (Glazed)": 35, 
+    "French Cruller (Chocolate)": 35, 
+    "French Cruller (Maple)": 35, 
+    "Old Fashioned (Glazed)": 35,
+    "Old Fashioned (Chocolate)": 35, 
+    "Old Fashioned (Maple)": 35, 
+    "Old Fashioned (Plain)": 35, 
+    "Rainbow Sprinkle Cake (Vanilla)": 35,
+    "Coconut Cake (Vanilla": 35
+    "Plain Cake w/ Choc Icing": 35, 
+    "Plain Cake with Choc Sprinkles": 35,
+    "Chocolate Frosted Cake (NO SPRINKLES)": 35, 
+    "Devil's Food": 35,
+    "Devil's Food with Sprinkles": 35, 
+    "Coconut Cake (Vanilla)": 35, 
+    "Cinnamon Crumb": 35, 
+    "Blueberry Cake": 35, 
+    "Glazed Cake Donut": 35, 
+    "Plain Cake": 35, 
+    "Donuts": 30, 
+    "Fancy Donuts": 20, 
+    "Assorted Regular Donuts": 30, 
+    "Assorted Fancy Donuts": 20, 
+    "Assorted Cake": 35, 
+    "Assorted Cake (NO PLAIN, NO SPRINKLES):": 35, 
+    "Mixed Muffins": 30,
+}
 
 packing_note_order = {'morning': 0, 'box': 1, 'tray': 2}
 route_order = {'route 1': 0, 'route 2': 1}
@@ -81,8 +131,12 @@ def create_summary_page(date, item_summary):
     for item in valid_items_order:
         if item in item_summary:
             qty = item_summary[item]
-            x = col1_x if col == 0 else col2_x
-            page.insert_text((x, y), f"{item}: {qty}", fontsize=12)
+            if item in donuts_per_screen:
+                screens = round(qty / donuts_per_screen[item], 2)
+                page.insert_text((x, y), f"{item}: {screens} screens", fontsize=12)
+            else:
+                page.insert_text((x, y), f"{item}: {qty} donuts", fontsize=12)
+
             y += y_step
             if y > y_limit and col == 0:
                 y = y_start
