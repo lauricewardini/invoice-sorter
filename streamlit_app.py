@@ -72,7 +72,8 @@ def extract_items(text):
     lines = text.splitlines()
     for line in lines:
         for item in valid_items:
-            if item.lower() in line.lower():
+            pattern = r'\b' + re.escape(item.lower()) + r'\b'
+            if re.search(pattern, line.lower()):
                 qty_match = re.search(r'(\d+)', line)
                 if qty_match:
                     qty = int(qty_match.group(1))
