@@ -73,7 +73,7 @@ def extract_items(text):
     item_counts = defaultdict(int)
     lines = text.splitlines()
 
-    # Sort by length descending to prioritize longest matches first
+    # Match longer items first to avoid substring issues
     sorted_items = sorted(valid_items_order, key=lambda x: -len(x))
 
     for line in lines:
@@ -81,12 +81,14 @@ def extract_items(text):
 
         for item in sorted_items:
             item_lower = item.lower()
-            if item_lower in line_lower:
+            # Require a match where item is surrounded by non-letter characters or line edges
+            pattern = rf'(?<!\w){re.escape(item_lower)}(?!\w)'
+            if re.search(pattern, line_lower):
                 qty_match = re.search(r'(\d+)', line)
                 if qty_match:
                     qty = int(qty_match.group(1))
                     item_counts[item] += qty
-                    break  # Avoid double-counting substrings
+                    break  # Stop after first match
     return item_counts
 
 def create_summary_page(date, item_summary):
