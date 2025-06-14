@@ -131,36 +131,36 @@ def create_summary_page(date, item_summary):
     for item in valid_items_order:
         if item in item_summary:
             def create_summary_page(date, item_summary):
-    doc = fitz.open()
-    page = doc.new_page()
-    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
+                doc = fitz.open()
+                page = doc.new_page()
+                page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
 
-    col1_x, col2_x = 50, 300
-    y_start = 100
-    y_step = 20
-    y_limit = 700
+                col1_x, col2_x = 50, 300
+                y_start = 100
+                y_step = 20
+                y_limit = 700
 
-    y = y_start
-    col = 0
-
-    for item in valid_items_order:
-        if item in item_summary:
-            qty = item_summary[item]
-
-            # Calculate screens if item has a per-screen value
-            if item in donuts_per_screen:
-                screens = round(qty / donuts_per_screen[item], 2)
-                label = f"{item}: {screens} screens"
-            else:
-                label = f"{item}: {qty} donuts"
-
-            x = col1_x if col == 0 else col2_x
-            page.insert_text((x, y), label, fontsize=12)
-            y += y_step
-
-            if y > y_limit and col == 0:
                 y = y_start
-                col = 1
+                col = 0
+
+                for item in valid_items_order:
+                    if item in item_summary:
+                        qty = item_summary[item]
+
+                        # Calculate screens if item has a per-screen value
+                        if item in donuts_per_screen:
+                            screens = round(qty / donuts_per_screen[item], 2)
+                            label = f"{item}: {screens} screens"
+                        else:
+                            label = f"{item}: {qty} donuts"
+
+                        x = col1_x if col == 0 else col2_x
+                        page.insert_text((x, y), label, fontsize=12)
+                        y += y_step
+
+                        if y > y_limit and col == 0:
+                            y = y_start
+                            col = 1
 
     temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
     doc.save(temp_file.name)
