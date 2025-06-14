@@ -73,22 +73,18 @@ def extract_items(text):
     item_counts = defaultdict(int)
     lines = text.splitlines()
 
+    # Sort items by length (longest first) to prevent substring matches
+    sorted_items = sorted(valid_items_order, key=lambda x: -len(x))
+
     for line in lines:
-        line_lower = line.lower()
-
-        for original_item in valid_items_order:
-            item_lower = re.escape(original_item.lower())
-
-            # Match item as a full phrase with boundaries (start/end or non-word chars)
-            pattern = rf'(^|\W){item_lower}(\W|$)'
-            if re.search(pattern, line_lower):
+        for original_item in sorted_items:
+            pattern = re.compile(rf'\b{re.escape(original_item)}\b', re.IGNORECASE)
+            if pattern.search(line):
                 qty_match = re.search(r'(\d+)', line)
                 if qty_match:
                     qty = int(qty_match.group(1))
                     item_counts[original_item] += qty
-                    # Debug:
-                    # print(f"✔ Matched '{original_item}' in: {line.strip()} → Qty: {qty}")
-
+                    break  # Stop after first match to prevent double-counting
     return item_counts
 
 def create_summary_page(date, item_summary):
