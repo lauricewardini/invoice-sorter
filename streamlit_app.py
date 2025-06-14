@@ -87,43 +87,47 @@ def extract_items(text):
 def create_summary_page(date, item_summary):
     import math
 
-    # Your updated categories
+    # Use ordered lists instead of sets
     category_mapping = {
-        "Fancy Donuts": {
+        "Fancy Donuts": [
             "Apple Fritter", "Bear Claw", "Frosted Claw", "Berry Claw", "Raspberry Fritter",
-            "Blueberry Fritter", "Cin Roll", "Frosted Roll", "Twist",
-            "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)"
-        },
-        "Raised Donuts": {
+            "Blueberry Fritter", "Cin Roll", "Frosted Roll", "Twist", "Buttermilk Bar (Glazed)", 
+            "Buttermilk Bar (Plain)"
+        ],
+        "Raised Donuts": [
             "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled",
             "Raspberry Filled", "Lemon Filled", "Sugar Raised", "French Cruller (Glazed)",
             "French Cruller (Chocolate)", "French Cruller (Maple)"
-        },
-        "Cake Donuts": {
+        ],
+        "Cake Donuts": [
             "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", "Old Fashioned (Maple)",
-            "Old Fashioned (Plain)", "Devil's Food", "Devil's Food with Sprinkles", "Plain Cake",
+            "Old Fashioned (Plain)", "Devil's Food", "Devil's Food with Sprinkles", "Plain Cake", 
             "Plain Cake w/ Choc Icing", "Plain Cake with Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
-            "Coconut Cake (Vanilla)", "Chocolate Frosted Cake (NO SPRINKLES)", "Blueberry Cake",
-            "Cinnamon Crumb", "Glazed Cake Donut", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)"
-        }
+            "Coconut Cake (Vanilla)", "Chocolate Frosted Cake (NO SPRINKLES)", "Blueberry Cake", "Cinnamon Crumb", 
+            "Glazed Cake Donut", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)"
+        ]
     }
 
-    # Assign items to category
+    # Assign items to categories + preserve order
     item_to_category = {}
+    category_order = list(category_mapping.keys())
+
     for cat, items in category_mapping.items():
         for item in items:
             item_to_category[item] = cat
 
-    categorized_items = {
-        "Fancy Donuts": [],
-        "Raised Donuts": [],
-        "Cake Donuts": [],
-        "Other": []
-    }
+    categorized_items = {cat: [] for cat in category_order}
+    categorized_items["Other"] = []
 
     for item in item_summary:
         category = item_to_category.get(item, "Other")
         categorized_items[category].append((item, item_summary[item]))
+
+    # Sort each category's items in the original list order
+    for cat, item_list in category_mapping.items():
+        items_found = {name: qty for name, qty in categorized_items[cat]}
+        sorted_items = [(name, items_found[name]) for name in item_list if name in items_found]
+        categorized_items[cat] = sorted_items
 
     doc = fitz.open()
     page = doc.new_page()
@@ -136,19 +140,17 @@ def create_summary_page(date, item_summary):
     col2_x = 360
     page_margin_bottom = 750
 
-    for category, items in categorized_items.items():
+    for category in category_order + ["Other"]:
+        items = categorized_items.get(category, [])
         if not items:
             continue
 
-        # Category title
         page.insert_text((col1_x, y), category, fontsize=13)
         y += y_step
 
-        # Divider line
         page.draw_line((col1_x, y), (col2_x + 140, y))
         y += y_step
 
-        # Table headers
         page.insert_text((col1_x, y), "Item", fontsize=11)
         page.insert_text((col2_x, y), "Qty", fontsize=11)
         y += y_step
