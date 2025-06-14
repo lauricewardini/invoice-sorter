@@ -72,22 +72,30 @@ valid_items = set(i.lower() for i in valid_items_order)
 def extract_items(text):
     item_counts = defaultdict(int)
     lines = text.splitlines()
-
-    # Sort items longest first so we match "Plain Cake w/ Choc Icing" before "Plain Cake"
     sorted_items = sorted(valid_items_order, key=lambda x: -len(x))
+    unmatched_lines = []
 
     for line in lines:
         line_lower = line.lower()
+        matched = False
 
         for item in sorted_items:
-            item_lower = item.lower()
-
-            if item_lower in line_lower:
+            if item.lower() in line_lower:
                 qty_match = re.search(r'(\d+)', line)
                 if qty_match:
                     qty = int(qty_match.group(1))
                     item_counts[item] += qty
-                    break  # Stop after first match to avoid miscounts
+                    matched = True
+                    break
+
+        if not matched and any(word in line_lower for word in ['cake', 'bar', 'fritter']):
+            unmatched_lines.append(line.strip())
+
+    if unmatched_lines:
+        print("⚠️ Potential untracked donut lines:")
+        for l in unmatched_lines:
+            print("  →", l)
+
     return item_counts
 
 def create_summary_page(date, item_summary):
