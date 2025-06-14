@@ -161,17 +161,28 @@ if uploaded_file is not None:
                                 current_invoice['route'] = 'route 2'
 
                             try:
-                                matched_vendor = next((v for v in vendor_rank if v.lower() in l_lower), None)
-                                if not matched_vendor:
-                                    match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.partial_ratio)
-                                    if match_result:
-                                        match, score, _ = match_result
-                                        if score > 90:
-                                            matched_vendor = match
-                                if matched_vendor:
-                                    current_invoice['vendor'] = matched_vendor
-                            except Exception as e:
-                                print(f"Vendor matching error on line: {l} -> {e}")
+    matched_vendor = None
+
+    # Exact match by line containing the full vendor name (safer)
+    for vendor in vendor_rank:
+        vendor_clean = vendor.strip().lower()
+        if vendor_clean and vendor_clean in l_lower:
+            matched_vendor = vendor
+            break
+
+    # Fallback to fuzzy match only if exact match fails
+    if not matched_vendor:
+        match_result = process.extractOne(l_lower, vendor_rank.keys(), scorer=fuzz.token_sort_ratio)
+        if match_result:
+            match, score, _ = match_result
+            if score >= 95:
+                matched_vendor = match
+
+    if matched_vendor:
+        current_invoice['vendor'] = matched_vendor
+except Exception as e:
+    print(f"Vendor matching error on line: {l} -> {e}")
+
                     else:
                         current_invoice['pages'].append(i)
                         page_items = extract_items(text)
