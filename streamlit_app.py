@@ -106,10 +106,13 @@ def create_summary_page(date, item_summary):
                 screens_raw = qty / donuts_per_screen[item]
                 screens = math.ceil(screens_raw * 2) / 2
                 screens_display = str(int(screens)) if screens.is_integer() else str(screens)
-                label = f"{item}: {screens_display} screens"
+                unit = "screen" if screens_display == "1" else "screens"
+                label = f"{item}: {screens_display} {unit}"
+                
             else:
                 qty_display = str(int(qty)) if isinstance(qty, (int, float)) and qty == int(qty) else str(qty)
-                label = f"{item}: {qty_display} donuts"
+                unit = "donut" if qty_display == "1" else "donuts"
+                label = f"{item}: {qty_display} {unit}"
 
             x = col1_x if col == 0 else col2_x
             page.insert_text((x, y), label, fontsize=12)
