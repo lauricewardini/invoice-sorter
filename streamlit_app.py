@@ -87,12 +87,12 @@ def extract_items(text):
 def create_summary_page(date, item_summary):
     import math
 
-    # Define categories
+    # Your updated categories
     category_mapping = {
         "Fancy Donuts": {
             "Apple Fritter", "Bear Claw", "Frosted Claw", "Berry Claw", "Raspberry Fritter",
-            "Blueberry Fritter", "Cin Roll", "Frosted Roll", "Twist", "Buttermilk Bar (Glazed)", 
-            "Buttermilk Bar (Plain)"
+            "Blueberry Fritter", "Cin Roll", "Frosted Roll", "Twist",
+            "Buttermilk Bar (Glazed)", "Buttermilk Bar (Plain)"
         },
         "Raised Donuts": {
             "Maple Bar", "Chocolate Bar", "Tiger Bar", "Glazed Raised", "Chocolate Raised", "Cream Filled",
@@ -101,20 +101,19 @@ def create_summary_page(date, item_summary):
         },
         "Cake Donuts": {
             "Old Fashioned (Glazed)", "Old Fashioned (Chocolate)", "Old Fashioned (Maple)",
-            "Old Fashioned (Plain)", "Devil's Food", "Devil's Food with Sprinkles", "Plain Cake", "Plain Cake w/ Choc Icing",
-            "Plain Cake with Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
-            "Coconut Cake (Vanilla)", "Chocolate Frosted Cake (NO SPRINKLES)",
-            "Blueberry Cake", "Cinnamon Crumb", "Glazed Cake Donut"
+            "Old Fashioned (Plain)", "Devil's Food", "Devil's Food with Sprinkles", "Plain Cake",
+            "Plain Cake w/ Choc Icing", "Plain Cake with Choc Sprinkles", "Rainbow Sprinkle Cake (Vanilla)",
+            "Coconut Cake (Vanilla)", "Chocolate Frosted Cake (NO SPRINKLES)", "Blueberry Cake",
+            "Cinnamon Crumb", "Glazed Cake Donut", "Assorted Cake", "Assorted Cake (NO PLAIN, NO SPRINKLES)"
         }
     }
 
-    # Determine category for each item
+    # Assign items to category
     item_to_category = {}
     for cat, items in category_mapping.items():
         for item in items:
             item_to_category[item] = cat
 
-    # Default: anything not mapped goes into "Other"
     categorized_items = {
         "Fancy Donuts": [],
         "Raised Donuts": [],
@@ -126,56 +125,56 @@ def create_summary_page(date, item_summary):
         category = item_to_category.get(item, "Other")
         categorized_items[category].append((item, item_summary[item]))
 
-    # Start PDF page
     doc = fitz.open()
     page = doc.new_page()
-    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14,)
+    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14)
 
-    col1_x, col2_x = 50, 300
-    y_start = 100
-    y_step = 20
-    y_limit = 750
-
-    y = y_start
+    y = 90
+    y_step = 18
+    row_spacing = 16
+    col1_x = 60
+    col2_x = 360
+    page_margin_bottom = 750
 
     for category, items in categorized_items.items():
         if not items:
             continue
 
-        # Category Header
-        page.insert_text((50, y), category, fontsize=13)
+        # Category title
+        page.insert_text((col1_x, y), category, fontsize=13)
         y += y_step
 
-        # Horizontal divider line
-        page.draw_line((50, y), (550, y))
+        # Divider line
+        page.draw_line((col1_x, y), (col2_x + 140, y))
         y += y_step
 
-        # Two-column layout
-        col = 0
+        # Table headers
+        page.insert_text((col1_x, y), "Item", fontsize=11)
+        page.insert_text((col2_x, y), "Qty", fontsize=11)
+        y += y_step
+
         for item, qty in items:
             if item in donuts_per_screen:
                 screens_raw = qty / donuts_per_screen[item]
                 screens = math.ceil(screens_raw * 2) / 2
                 screens_display = str(int(screens)) if screens.is_integer() else str(screens)
                 unit = "screen" if screens_display == "1" else "screens"
-                label = f"{item}: {screens_display} {unit}"
+                qty_display = f"{screens_display} {unit}"
             else:
-                qty_display = str(int(qty)) if isinstance(qty, (int, float)) and qty == int(qty) else str(qty)
-                unit = "donut" if qty_display == "1" else "donuts"
-                label = f"{item}: {qty_display} {unit}"
+                qty_num = int(qty) if isinstance(qty, (int, float)) and qty == int(qty) else qty
+                unit = "donut" if qty_num == 1 else "donuts"
+                qty_display = f"{qty_num} {unit}"
 
-            x = col1_x if col == 0 else col2_x
-            page.insert_text((x, y), label, fontsize=11)
+            page.insert_text((col1_x, y), item, fontsize=10)
+            page.insert_text((col2_x, y), qty_display, fontsize=10)
 
-            if col == 1:
-                y += y_step
-            col = (col + 1) % 2
+            y += row_spacing
 
-            if y > y_limit:
+            if y > page_margin_bottom:
                 page = doc.new_page()
-                y = y_start
+                y = 50
 
-        y += y_step  # Extra space after each category
+        y += y_step
 
     temp_file = NamedTemporaryFile(delete=False, suffix=".pdf")
     doc.save(temp_file.name)
