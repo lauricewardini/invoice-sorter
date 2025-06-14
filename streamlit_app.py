@@ -77,7 +77,7 @@ def extract_items(text):
                 qty_match = re.search(r'(\d+)', line)
                 if qty_match:
                     qty = int(qty_match.group(1))
-                    item_counts[item] += qty
+                    item_counts[item] += qty  # ✅ This is correctly scoped
     return item_counts
 
 def create_summary_page(date, item_summary):
