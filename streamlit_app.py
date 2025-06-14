@@ -32,11 +32,11 @@ valid_items = set(valid_items_order)
 donuts_per_screen = {
     "Maple Bar": 20,
     "Chocolate Bar": 20,
-    "Tiger Bar": 20 
+    "Tiger Bar": 20,
     "Glazed Raised": 35,
     "Chocolate Raised": 35,
     "Cream Filled": 35,
-    "Maple Cream Filled": 35
+    "Maple Cream Filled": 35,
     "Raspberry Filled": 35,
     "Lemon Filled": 35, 
     "Sugar Raised": 35, 
