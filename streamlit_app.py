@@ -135,11 +135,16 @@ def create_summary_page(date, item_summary):
              # Calculate screens if item has a per-screen value
         if item in donuts_per_screen:
             import math
-            screens = math.ceil((qty / donuts_per_screen[item]) * 2) / 2
-            label = f"{item}: {screens} screens"
-        else:
-            label = f"{item}: {qty} donuts"
-
+            screens_raw = qty / donuts_per_screen[item]
+            screens = math.ceil(screens_raw * 2) / 2
+            # Format cleanly: no ".0" if whole number
+            if screens.is_integer():
+                screens_display = str(int(screens))
+            else:
+                screens_display = str(screens)
+            label = f"{item}: {screens_display} screens"
+            else:
+                label = f"{item}: {qty} donuts"
         x = col1_x if col == 0 else col2_x
         page.insert_text((x, y), label, fontsize=12)
         y += y_step
