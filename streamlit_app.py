@@ -129,7 +129,7 @@ def create_summary_page(date, item_summary):
     # Start PDF page
     doc = fitz.open()
     page = doc.new_page()
-    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14, fontname="helvb")
+    page.insert_text((50, 50), f"Totals for {date.strftime('%m/%d/%Y')}", fontsize=14,)
 
     col1_x, col2_x = 50, 300
     y_start = 100
@@ -143,7 +143,7 @@ def create_summary_page(date, item_summary):
             continue
 
         # Category Header
-        page.insert_text((50, y), category, fontsize=13, fontname="helvb")
+        page.insert_text((50, y), category, fontsize=13)
         y += y_step
 
         # Horizontal divider line
