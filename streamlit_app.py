@@ -180,8 +180,8 @@ if uploaded_file is not None:
 
                                 if matched_vendor:
                                     current_invoice['vendor'] = matched_vendor
-except Exception as e:
-    print(f"Vendor matching error on line: {l} -> {e}")
+                            except Exception as e:
+                                print(f"Vendor matching error on line: {l} -> {e}")
 
                     else:
                         current_invoice['pages'].append(i)
